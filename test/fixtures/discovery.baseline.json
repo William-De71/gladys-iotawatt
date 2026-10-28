@@ -1,0 +1,360 @@
+{
+  "devices": {
+    "meter": {
+      "external_id": "ext:test-integration:meter:5ccf7f123456",
+      "should_poll": false,
+      "params": ["IOTAWATT_MAC"],
+      "features": [
+        {
+          "external_id": "ext:test-integration:meter:5ccf7f123456:rssi",
+          "category": "signal",
+          "type": "integer",
+          "unit": null,
+          "min": -120,
+          "max": 0,
+          "read_only": true,
+          "has_feedback": false
+        },
+        {
+          "external_id": "ext:test-integration:meter:5ccf7f123456:rtc_battery_low",
+          "category": "battery-low",
+          "type": "binary",
+          "unit": null,
+          "min": 0,
+          "max": 1,
+          "read_only": true,
+          "has_feedback": false
+        },
+        {
+          "external_id": "ext:test-integration:meter:5ccf7f123456:firmware",
+          "category": "text",
+          "type": "text",
+          "unit": null,
+          "min": 0,
+          "max": 0,
+          "read_only": true,
+          "has_feedback": false
+        }
+      ]
+    },
+    "input_voltage": {
+      "external_id": "ext:test-integration:channel:5ccf7f123456-in0",
+      "should_poll": false,
+      "params": ["IOTAWATT_MAC", "IOTAWATT_SERIES"],
+      "features": [
+        {
+          "external_id": "ext:test-integration:channel:5ccf7f123456-in0:voltage",
+          "category": "energy-sensor",
+          "type": "voltage",
+          "unit": "volt",
+          "min": 0,
+          "max": 1000,
+          "read_only": true,
+          "has_feedback": false
+        }
+      ]
+    },
+    "input_power": {
+      "external_id": "ext:test-integration:channel:5ccf7f123456-in1",
+      "should_poll": false,
+      "params": ["IOTAWATT_MAC", "IOTAWATT_SERIES"],
+      "features": [
+        {
+          "external_id": "ext:test-integration:channel:5ccf7f123456-in1:power",
+          "category": "energy-sensor",
+          "type": "power",
+          "unit": "watt",
+          "min": -100000,
+          "max": 100000,
+          "read_only": true,
+          "has_feedback": false
+        },
+        {
+          "external_id": "ext:test-integration:channel:5ccf7f123456-in1:energy",
+          "category": "energy-sensor",
+          "type": "index",
+          "unit": "kilowatt-hour",
+          "min": 0,
+          "max": 1000000000,
+          "read_only": true,
+          "has_feedback": false
+        }
+      ]
+    },
+    "input_bidirectional": {
+      "external_id": "ext:test-integration:channel:5ccf7f123456-in4",
+      "should_poll": false,
+      "params": ["IOTAWATT_MAC", "IOTAWATT_SERIES"],
+      "features": [
+        {
+          "external_id": "ext:test-integration:channel:5ccf7f123456-in4:power",
+          "category": "energy-sensor",
+          "type": "power",
+          "unit": "watt",
+          "min": -100000,
+          "max": 100000,
+          "read_only": true,
+          "has_feedback": false
+        },
+        {
+          "external_id": "ext:test-integration:channel:5ccf7f123456-in4:energy",
+          "category": "energy-sensor",
+          "type": "index",
+          "unit": "kilowatt-hour",
+          "min": 0,
+          "max": 1000000000,
+          "read_only": true,
+          "has_feedback": false
+        },
+        {
+          "external_id": "ext:test-integration:channel:5ccf7f123456-in4:energy_export",
+          "category": "energy-production-sensor",
+          "type": "index",
+          "unit": "kilowatt-hour",
+          "min": 0,
+          "max": 1000000000,
+          "read_only": true,
+          "has_feedback": false
+        }
+      ]
+    },
+    "output_power": {
+      "external_id": "ext:test-integration:channel:5ccf7f123456-out-Total",
+      "should_poll": false,
+      "params": ["IOTAWATT_MAC", "IOTAWATT_SERIES"],
+      "features": [
+        {
+          "external_id": "ext:test-integration:channel:5ccf7f123456-out-Total:power",
+          "category": "energy-sensor",
+          "type": "power",
+          "unit": "watt",
+          "min": -100000,
+          "max": 100000,
+          "read_only": true,
+          "has_feedback": false
+        },
+        {
+          "external_id": "ext:test-integration:channel:5ccf7f123456-out-Total:energy",
+          "category": "energy-sensor",
+          "type": "index",
+          "unit": "kilowatt-hour",
+          "min": 0,
+          "max": 1000000000,
+          "read_only": true,
+          "has_feedback": false
+        }
+      ]
+    },
+    "output_current": {
+      "external_id": "ext:test-integration:channel:5ccf7f123456-out-Mains_amps",
+      "should_poll": false,
+      "params": ["IOTAWATT_MAC", "IOTAWATT_SERIES"],
+      "features": [
+        {
+          "external_id": "ext:test-integration:channel:5ccf7f123456-out-Mains_amps:current",
+          "category": "energy-sensor",
+          "type": "current",
+          "unit": "ampere",
+          "min": -1000,
+          "max": 1000,
+          "read_only": true,
+          "has_feedback": false
+        }
+      ]
+    }
+  },
+  "manifest": {
+    "config_schema": [
+      {
+        "key": "intro",
+        "type": "section"
+      },
+      {
+        "key": "hosts",
+        "type": "string"
+      },
+      {
+        "key": "auth",
+        "type": "section"
+      },
+      {
+        "key": "username",
+        "type": "select"
+      },
+      {
+        "key": "password",
+        "type": "secret"
+      },
+      {
+        "key": "options",
+        "type": "section"
+      },
+      {
+        "key": "interval",
+        "type": "select"
+      },
+      {
+        "key": "language",
+        "type": "select"
+      }
+    ],
+    "actions": ["search", "diagnostic"],
+    "action_fields": {
+      "search": [],
+      "diagnostic": []
+    },
+    "widgets": [
+      {
+        "key": "overview",
+        "settings": ["meter"],
+        "options": {}
+      },
+      {
+        "key": "channel",
+        "settings": ["channel", "view"],
+        "options": {
+          "view": ["power_day", "energy_days", "energy_months"]
+        }
+      }
+    ],
+    "scene_triggers": [
+      {
+        "key": "meter_unreachable",
+        "fields": [
+          {
+            "key": "meter",
+            "options": []
+          }
+        ],
+        "variables": [
+          {
+            "key": "meter",
+            "type": "string"
+          },
+          {
+            "key": "meter_name",
+            "type": "string"
+          },
+          {
+            "key": "address",
+            "type": "string"
+          },
+          {
+            "key": "mac",
+            "type": "string"
+          },
+          {
+            "key": "message",
+            "type": "string"
+          },
+          {
+            "key": "failures",
+            "type": "number"
+          }
+        ]
+      },
+      {
+        "key": "meter_back_online",
+        "fields": [
+          {
+            "key": "meter",
+            "options": []
+          }
+        ],
+        "variables": [
+          {
+            "key": "meter",
+            "type": "string"
+          },
+          {
+            "key": "meter_name",
+            "type": "string"
+          },
+          {
+            "key": "address",
+            "type": "string"
+          },
+          {
+            "key": "mac",
+            "type": "string"
+          },
+          {
+            "key": "message",
+            "type": "string"
+          },
+          {
+            "key": "down_minutes",
+            "type": "number"
+          }
+        ]
+      },
+      {
+        "key": "meter_restarted",
+        "fields": [
+          {
+            "key": "meter",
+            "options": []
+          }
+        ],
+        "variables": [
+          {
+            "key": "meter",
+            "type": "string"
+          },
+          {
+            "key": "meter_name",
+            "type": "string"
+          },
+          {
+            "key": "address",
+            "type": "string"
+          },
+          {
+            "key": "mac",
+            "type": "string"
+          },
+          {
+            "key": "message",
+            "type": "string"
+          },
+          {
+            "key": "uptime_before_hours",
+            "type": "number"
+          }
+        ]
+      }
+    ],
+    "scene_actions": [
+      {
+        "key": "get_energy",
+        "fields": ["channel", "period"],
+        "outputs": [
+          {
+            "key": "channel_name",
+            "type": "string"
+          },
+          {
+            "key": "energy_kwh",
+            "type": "number"
+          },
+          {
+            "key": "average_watts",
+            "type": "number"
+          },
+          {
+            "key": "period_start",
+            "type": "string"
+          },
+          {
+            "key": "period_end",
+            "type": "string"
+          },
+          {
+            "key": "summary",
+            "type": "string"
+          }
+        ]
+      }
+    ]
+  }
+}

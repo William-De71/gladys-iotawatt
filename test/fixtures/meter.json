@@ -1,0 +1,135 @@
+{
+  "comment": "A made-up IoTaWatt on the shapes of the firmware 02_08_04 (webServer.cpp handleStatus, CSVquery.cpp show=series).",
+  "status": {
+    "device": {
+      "name": "IotaWatt",
+      "timediff": 0,
+      "allowdst": false,
+      "update": "MAJOR"
+    },
+    "stats": {
+      "cyclerate": 400,
+      "chanrate": 30,
+      "starttime": 1792454400,
+      "currenttime": 1793178000,
+      "runseconds": 723600,
+      "stack": 20000,
+      "version": "02_08_04",
+      "frequency": 50.01,
+      "lowbat": false
+    },
+    "inputs": [
+      {
+        "channel": 0,
+        "Vrms": 231.4,
+        "Hz": 50.01,
+        "phase": 0
+      },
+      {
+        "channel": 1,
+        "Watts": "1520",
+        "Pf": 0.9,
+        "phase": 1,
+        "lastphase": 1
+      },
+      {
+        "channel": 2,
+        "Watts": "840",
+        "Pf": 0.9,
+        "phase": 1,
+        "lastphase": 1
+      },
+      {
+        "channel": 4,
+        "Watts": "-1200",
+        "Pf": 0.9,
+        "phase": 1,
+        "lastphase": 1
+      },
+      {
+        "channel": 5,
+        "Watts": "0",
+        "Pf": 0.9,
+        "phase": 1,
+        "lastphase": 1
+      }
+    ],
+    "outputs": [
+      {
+        "name": "Total",
+        "units": "Watts",
+        "value": 2720
+      },
+      {
+        "name": "Mains_amps",
+        "units": "Amps",
+        "value": 6.6
+      },
+      {
+        "name": "Mains_pf",
+        "units": "PF",
+        "value": 0.92
+      }
+    ],
+    "wifi": {
+      "connecttime": 100,
+      "SSID": "home",
+      "IP": "192.168.1.20",
+      "channel": 6,
+      "RSSI": -61,
+      "mac": "5C:CF:7F:12:34:56"
+    },
+    "datalogs": [
+      {
+        "id": "Current",
+        "firstkey": 1,
+        "lastkey": 1793178000,
+        "size": 1,
+        "interval": 5
+      },
+      {
+        "id": "History",
+        "firstkey": 1,
+        "lastkey": 1,
+        "size": 1,
+        "interval": 60
+      }
+    ]
+  },
+  "series": {
+    "series": [
+      {
+        "name": "Voltage",
+        "unit": "Volts"
+      },
+      {
+        "name": "Mains",
+        "unit": "Watts"
+      },
+      {
+        "name": "Heat_Pump",
+        "unit": "Watts"
+      },
+      {
+        "name": "Solar",
+        "unit": "Watts"
+      },
+      {
+        "name": "Oven",
+        "unit": "Watts"
+      },
+      {
+        "name": "Total",
+        "unit": "Watts"
+      },
+      {
+        "name": "Mains_amps",
+        "unit": "Amps"
+      },
+      {
+        "name": "Mains_pf",
+        "unit": "PF"
+      }
+    ]
+  }
+}

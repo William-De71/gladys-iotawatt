@@ -1,0 +1,917 @@
+{
+  "manifest_version": 1,
+  "type": "device",
+  "name": "IoTaWatt",
+  "description": {
+    "en": "IoTaWatt energy monitor on the local network: power, energy and voltage per circuit.",
+    "fr": "Moniteur d’énergie IoTaWatt en local : puissance, énergie et tension par circuit.",
+    "de": "IoTaWatt-Energiemonitor im lokalen Netz: Leistung, Energie und Spannung je Stromkreis.",
+    "es": "Monitor de energía IoTaWatt en red local: potencia, energía y tensión por circuito."
+  },
+  "version": "0.1.0",
+  "docker_image": "ghcr.io/william-de71/gladys-iotawatt:0.1.0",
+  "gladys_version": ">=5.3.0",
+  "categories": ["energy"],
+  "keywords": [
+    "IoTaWatt",
+    "energy monitor",
+    "CT clamp",
+    "current transformer",
+    "pince ampèremétrique",
+    "consommation électrique",
+    "Stromzähler",
+    "Energiemonitor",
+    "monitor de energía",
+    "submetering"
+  ],
+  "cover_image": "https://raw.githubusercontent.com/William-De71/gladys-iotawatt/main/cover.jpg",
+  "transports": ["local"],
+  "network_discovery": [
+    {
+      "type": "mdns",
+      "service": "_http._tcp"
+    }
+  ],
+  "config_schema": [
+    {
+      "key": "intro",
+      "type": "section",
+      "label": {
+        "en": "IoTaWatt on your network",
+        "fr": "IoTaWatt sur votre réseau",
+        "de": "IoTaWatt in deinem Netzwerk",
+        "es": "IoTaWatt en su red"
+      },
+      "description": {
+        "en": "The integration reads your IoTaWatt over the local network, through its local API, and never writes to it: nothing leaves your home. Leave the addresses empty to find it automatically (its name must contain “iota”, as by default), or type its IP address or name. Not affiliated with IoTaWatt, Inc.",
+        "fr": "L’intégration lit votre IoTaWatt sur le réseau local, par son API locale, et n’y écrit jamais : rien ne sort de chez vous. Laissez les adresses vides pour le trouver automatiquement (son nom doit contenir « iota », comme par défaut), ou saisissez son adresse IP ou son nom. Non affiliée à IoTaWatt, Inc.",
+        "de": "Die Integration liest deinen IoTaWatt über das lokale Netzwerk mit seiner lokalen API und schreibt nie darauf: Nichts verlässt dein Zuhause. Lass die Adressen leer, um ihn automatisch zu finden (sein Name muss „iota“ enthalten, wie standardmäßig), oder gib seine IP-Adresse oder seinen Namen ein. Nicht mit IoTaWatt, Inc. verbunden.",
+        "es": "La integración lee su IoTaWatt por la red local, mediante su API local, y nunca escribe en él: nada sale de su casa. Deje las direcciones vacías para encontrarlo automáticamente (su nombre debe contener «iota», como por defecto), o introduzca su dirección IP o su nombre. No afiliada a IoTaWatt, Inc."
+      },
+      "links": [
+        {
+          "url": "https://docs.iotawatt.com/en/master/query.html",
+          "label": {
+            "en": "IoTaWatt query API",
+            "fr": "API de requête IoTaWatt",
+            "de": "IoTaWatt-Abfrage-API",
+            "es": "API de consulta de IoTaWatt"
+          }
+        }
+      ]
+    },
+    {
+      "key": "hosts",
+      "type": "string",
+      "required": false,
+      "label": {
+        "en": "Addresses",
+        "fr": "Adresses",
+        "de": "Adressen",
+        "es": "Direcciones"
+      },
+      "description": {
+        "en": "IP addresses or names of your IoTaWatt devices, separated by commas. Empty: automatic search.",
+        "fr": "Adresses IP ou noms de vos IoTaWatt, séparés par des virgules. Vide : recherche automatique.",
+        "de": "IP-Adressen oder Namen deiner IoTaWatt, durch Kommas getrennt. Leer: automatische Suche.",
+        "es": "Direcciones IP o nombres de sus IoTaWatt, separados por comas. Vacío: búsqueda automática."
+      },
+      "placeholder": {
+        "en": "192.168.1.20, iotawatt.local",
+        "fr": "192.168.1.20, iotawatt.local",
+        "de": "192.168.1.20, iotawatt.local",
+        "es": "192.168.1.20, iotawatt.local"
+      }
+    },
+    {
+      "key": "auth",
+      "type": "section",
+      "label": {
+        "en": "Password (optional)",
+        "fr": "Mot de passe (facultatif)",
+        "de": "Passwort (optional)",
+        "es": "Contraseña (opcional)"
+      },
+      "description": {
+        "en": "Only if you set passwords in the IoTaWatt configuration app (Setup → Passwords) and did not allow local access without one. The “user” account is enough: it can only read.",
+        "fr": "Seulement si vous avez défini des mots de passe dans l’application de configuration de l’IoTaWatt (Setup → Passwords) sans autoriser l’accès local sans mot de passe. Le compte « user » suffit : il ne peut que lire.",
+        "de": "Nur wenn du in der Konfigurations-App des IoTaWatt Passwörter gesetzt hast (Setup → Passwords) und den lokalen Zugriff ohne Passwort nicht erlaubt hast. Das Konto „user“ genügt: Es kann nur lesen.",
+        "es": "Solo si definió contraseñas en la aplicación de configuración del IoTaWatt (Setup → Passwords) sin permitir el acceso local sin contraseña. La cuenta «user» basta: solo puede leer."
+      }
+    },
+    {
+      "key": "username",
+      "type": "select",
+      "default": "user",
+      "label": {
+        "en": "User",
+        "fr": "Utilisateur",
+        "de": "Benutzer",
+        "es": "Usuario"
+      },
+      "options": [
+        {
+          "value": "user",
+          "label": {
+            "en": "user (read only)",
+            "fr": "user (lecture seule)",
+            "de": "user (nur lesen)",
+            "es": "user (solo lectura)"
+          }
+        },
+        {
+          "value": "admin",
+          "label": {
+            "en": "admin",
+            "fr": "admin",
+            "de": "admin",
+            "es": "admin"
+          }
+        }
+      ]
+    },
+    {
+      "key": "password",
+      "type": "secret",
+      "required": false,
+      "label": {
+        "en": "Password",
+        "fr": "Mot de passe",
+        "de": "Passwort",
+        "es": "Contraseña"
+      },
+      "placeholder": {
+        "en": "Leave empty without a password",
+        "fr": "Laisser vide sans mot de passe",
+        "de": "Ohne Passwort leer lassen",
+        "es": "Dejar vacío sin contraseña"
+      }
+    },
+    {
+      "key": "options",
+      "type": "section",
+      "label": {
+        "en": "Options",
+        "fr": "Options",
+        "de": "Optionen",
+        "es": "Opciones"
+      }
+    },
+    {
+      "key": "interval",
+      "type": "select",
+      "default": "30",
+      "label": {
+        "en": "Power reading",
+        "fr": "Lecture de la puissance",
+        "de": "Leistungsabfrage",
+        "es": "Lectura de la potencia"
+      },
+      "description": {
+        "en": "How often the power is read. The energy is counted every minute from the IoTaWatt log, whatever this setting.",
+        "fr": "Fréquence de lecture de la puissance. L’énergie est comptée chaque minute à partir du journal de l’IoTaWatt, quel que soit ce réglage.",
+        "de": "Wie oft die Leistung abgefragt wird. Die Energie wird unabhängig davon jede Minute aus dem Protokoll des IoTaWatt gezählt.",
+        "es": "Frecuencia de lectura de la potencia. La energía se cuenta cada minuto a partir del registro del IoTaWatt, sea cual sea este ajuste."
+      },
+      "options": [
+        {
+          "value": "10",
+          "label": {
+            "en": "Every 10 seconds",
+            "fr": "Toutes les 10 secondes",
+            "de": "Alle 10 Sekunden",
+            "es": "Cada 10 segundos"
+          }
+        },
+        {
+          "value": "30",
+          "label": {
+            "en": "Every 30 seconds",
+            "fr": "Toutes les 30 secondes",
+            "de": "Alle 30 Sekunden",
+            "es": "Cada 30 segundos"
+          }
+        },
+        {
+          "value": "60",
+          "label": {
+            "en": "Every minute",
+            "fr": "Toutes les minutes",
+            "de": "Jede Minute",
+            "es": "Cada minuto"
+          }
+        }
+      ]
+    },
+    {
+      "key": "language",
+      "type": "select",
+      "default": "auto",
+      "label": {
+        "en": "Language of the texts",
+        "fr": "Langue des textes",
+        "de": "Sprache der Texte",
+        "es": "Idioma de los textos"
+      },
+      "description": {
+        "en": "Feature names, scene texts and errors. Automatic: the language of the last widget shown.",
+        "fr": "Noms des fonctionnalités, textes des scènes et erreurs. Automatique : la langue du dernier widget affiché.",
+        "de": "Namen der Funktionen, Szenentexte und Fehler. Automatisch: die Sprache des zuletzt angezeigten Widgets.",
+        "es": "Nombres de las funciones, textos de escenas y errores. Automático: el idioma del último widget mostrado."
+      },
+      "options": [
+        {
+          "value": "auto",
+          "label": {
+            "en": "Automatic",
+            "fr": "Automatique",
+            "de": "Automatisch",
+            "es": "Automático"
+          }
+        },
+        {
+          "value": "en",
+          "label": {
+            "en": "English",
+            "fr": "English",
+            "de": "English",
+            "es": "English"
+          }
+        },
+        {
+          "value": "fr",
+          "label": {
+            "en": "Français",
+            "fr": "Français",
+            "de": "Français",
+            "es": "Français"
+          }
+        },
+        {
+          "value": "de",
+          "label": {
+            "en": "Deutsch",
+            "fr": "Deutsch",
+            "de": "Deutsch",
+            "es": "Deutsch"
+          }
+        },
+        {
+          "value": "es",
+          "label": {
+            "en": "Español",
+            "fr": "Español",
+            "de": "Español",
+            "es": "Español"
+          }
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "key": "search",
+      "timeout_seconds": 60,
+      "label": {
+        "en": "Search and test",
+        "fr": "Rechercher et tester",
+        "de": "Suchen und testen",
+        "es": "Buscar y probar"
+      },
+      "description": {
+        "en": "Looks for the IoTaWatt devices (addresses typed and network search), reads them and offers their channels on the Discover screen.",
+        "fr": "Cherche les IoTaWatt (adresses saisies et recherche sur le réseau), les lit et propose leurs voies dans l’écran Découverte.",
+        "de": "Sucht die IoTaWatt (eingegebene Adressen und Netzwerksuche), liest sie und bietet ihre Kanäle im Bildschirm Entdecken an.",
+        "es": "Busca los IoTaWatt (direcciones introducidas y búsqueda en la red), los lee y ofrece sus canales en la pantalla Descubrir."
+      }
+    },
+    {
+      "key": "diagnostic",
+      "timeout_seconds": 10,
+      "label": {
+        "en": "Diagnostic",
+        "fr": "Diagnostic",
+        "de": "Diagnose",
+        "es": "Diagnóstico"
+      },
+      "description": {
+        "en": "Writes what the integration knows to its logs (never the password), for a bug report.",
+        "fr": "Écrit ce que sait l’intégration dans ses journaux (jamais le mot de passe), pour un signalement de bug.",
+        "de": "Schreibt, was die Integration weiß, in ihre Protokolle (nie das Passwort), für einen Fehlerbericht.",
+        "es": "Escribe lo que sabe la integración en sus registros (nunca la contraseña), para un informe de error."
+      }
+    }
+  ],
+  "widgets": [
+    {
+      "key": "overview",
+      "label": {
+        "en": "IoTaWatt",
+        "fr": "IoTaWatt",
+        "de": "IoTaWatt",
+        "es": "IoTaWatt"
+      },
+      "description": {
+        "en": "One IoTaWatt: power of its busiest channels, state, Wi-Fi, clock battery, firmware.",
+        "fr": "Un IoTaWatt : puissance des voies les plus chargées, état, Wi-Fi, pile, micrologiciel.",
+        "de": "Ein IoTaWatt: Leistung der stärksten Kanäle, Zustand, WLAN, Uhrbatterie, Firmware.",
+        "es": "Un IoTaWatt: potencia de los canales más cargados, estado, Wi-Fi, pila, firmware."
+      },
+      "icon": "zap",
+      "settings": [
+        {
+          "key": "meter",
+          "type": "select",
+          "source": "devices",
+          "required": false,
+          "label": {
+            "en": "IoTaWatt",
+            "fr": "IoTaWatt",
+            "de": "IoTaWatt",
+            "es": "IoTaWatt"
+          },
+          "description": {
+            "en": "The IoTaWatt device (or one of its channels). Leave empty for the first one.",
+            "fr": "L’appareil IoTaWatt (ou l’une de ses voies). Laissez vide pour le premier.",
+            "de": "Das IoTaWatt-Gerät (oder einer seiner Kanäle). Leer lassen für den ersten.",
+            "es": "El dispositivo IoTaWatt (o uno de sus canales). Déjelo vacío para el primero."
+          }
+        }
+      ]
+    },
+    {
+      "key": "channel",
+      "label": {
+        "en": "IoTaWatt channel",
+        "fr": "Voie IoTaWatt",
+        "de": "IoTaWatt-Kanal",
+        "es": "Canal IoTaWatt"
+      },
+      "description": {
+        "en": "One channel: power now, energy of today and yesterday, and a chart from the IoTaWatt log.",
+        "fr": "Une voie : puissance actuelle, énergie du jour et de la veille, graphique du journal.",
+        "de": "Ein Kanal: aktuelle Leistung, Energie von heute und gestern, Diagramm aus dem Protokoll.",
+        "es": "Un canal: potencia actual, energía de hoy y de ayer, y un gráfico del registro del IoTaWatt."
+      },
+      "icon": "bar-chart-2",
+      "settings": [
+        {
+          "key": "channel",
+          "type": "select",
+          "source": "devices",
+          "required": false,
+          "label": {
+            "en": "Channel",
+            "fr": "Voie",
+            "de": "Kanal",
+            "es": "Canal"
+          },
+          "description": {
+            "en": "A channel of an IoTaWatt. Leave empty for the first one.",
+            "fr": "Une voie d’un IoTaWatt. Laissez vide pour la première.",
+            "de": "Ein Kanal eines IoTaWatt. Leer lassen für den ersten.",
+            "es": "Un canal de un IoTaWatt. Déjelo vacío para el primero."
+          }
+        },
+        {
+          "key": "view",
+          "type": "select",
+          "default": "power_day",
+          "required": false,
+          "label": {
+            "en": "Chart",
+            "fr": "Graphique",
+            "de": "Diagramm",
+            "es": "Gráfico"
+          },
+          "options": [
+            {
+              "value": "power_day",
+              "label": {
+                "en": "Power over 24 hours",
+                "fr": "Puissance sur 24 heures",
+                "de": "Leistung über 24 Stunden",
+                "es": "Potencia en 24 horas"
+              }
+            },
+            {
+              "value": "energy_days",
+              "label": {
+                "en": "Energy per day (14 days)",
+                "fr": "Énergie par jour (14 jours)",
+                "de": "Energie pro Tag (14 Tage)",
+                "es": "Energía por día (14 días)"
+              }
+            },
+            {
+              "value": "energy_months",
+              "label": {
+                "en": "Energy per month (12 months)",
+                "fr": "Énergie par mois (12 mois)",
+                "de": "Energie pro Monat (12 Monate)",
+                "es": "Energía por mes (12 meses)"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "scene_triggers": [
+    {
+      "key": "meter_unreachable",
+      "label": {
+        "en": "IoTaWatt: not answering",
+        "fr": "IoTaWatt : ne répond plus",
+        "de": "IoTaWatt: antwortet nicht",
+        "es": "IoTaWatt: no responde"
+      },
+      "description": {
+        "en": "The IoTaWatt has not answered 3 readings in a row (power cut, Wi-Fi lost, crash).",
+        "fr": "L’IoTaWatt n’a pas répondu à 3 lectures de suite (coupure de courant, Wi-Fi perdu, plantage).",
+        "de": "Der IoTaWatt hat 3 Abfragen in Folge nicht beantwortet (Stromausfall, WLAN weg, Absturz).",
+        "es": "El IoTaWatt no ha respondido a 3 lecturas seguidas (corte de luz, Wi-Fi perdido, bloqueo)."
+      },
+      "fields": [
+        {
+          "key": "meter",
+          "type": "select",
+          "source": "devices",
+          "required": false,
+          "label": {
+            "en": "IoTaWatt",
+            "fr": "IoTaWatt",
+            "de": "IoTaWatt",
+            "es": "IoTaWatt"
+          },
+          "description": {
+            "en": "The IoTaWatt device itself (not a channel). Leave empty for any IoTaWatt.",
+            "fr": "L’appareil IoTaWatt lui-même (pas une voie). Laissez vide pour n’importe quel IoTaWatt.",
+            "de": "Das IoTaWatt-Gerät selbst (kein Kanal). Leer lassen für jeden IoTaWatt.",
+            "es": "El propio dispositivo IoTaWatt (no un canal). Déjelo vacío para cualquier IoTaWatt."
+          }
+        }
+      ],
+      "variables": [
+        {
+          "key": "meter",
+          "type": "string",
+          "label": {
+            "en": "Device",
+            "fr": "Appareil",
+            "de": "Gerät",
+            "es": "Dispositivo"
+          }
+        },
+        {
+          "key": "meter_name",
+          "type": "string",
+          "label": {
+            "en": "IoTaWatt name",
+            "fr": "Nom de l’IoTaWatt",
+            "de": "Name des IoTaWatt",
+            "es": "Nombre del IoTaWatt"
+          }
+        },
+        {
+          "key": "address",
+          "type": "string",
+          "label": {
+            "en": "Address",
+            "fr": "Adresse",
+            "de": "Adresse",
+            "es": "Dirección"
+          }
+        },
+        {
+          "key": "mac",
+          "type": "string",
+          "label": {
+            "en": "MAC address",
+            "fr": "Adresse MAC",
+            "de": "MAC-Adresse",
+            "es": "Dirección MAC"
+          }
+        },
+        {
+          "key": "message",
+          "type": "string",
+          "label": {
+            "en": "Message",
+            "fr": "Message",
+            "de": "Nachricht",
+            "es": "Mensaje"
+          }
+        },
+        {
+          "key": "failures",
+          "type": "number",
+          "label": {
+            "en": "Readings missed",
+            "fr": "Lectures manquées",
+            "de": "Verpasste Abfragen",
+            "es": "Lecturas perdidas"
+          }
+        }
+      ]
+    },
+    {
+      "key": "meter_back_online",
+      "label": {
+        "en": "IoTaWatt: answering again",
+        "fr": "IoTaWatt : répond de nouveau",
+        "de": "IoTaWatt: antwortet wieder",
+        "es": "IoTaWatt: vuelve a responder"
+      },
+      "description": {
+        "en": "The IoTaWatt answers again after being unreachable.",
+        "fr": "L’IoTaWatt répond de nouveau après une absence.",
+        "de": "Der IoTaWatt antwortet wieder, nachdem er nicht erreichbar war.",
+        "es": "El IoTaWatt vuelve a responder tras no estar disponible."
+      },
+      "fields": [
+        {
+          "key": "meter",
+          "type": "select",
+          "source": "devices",
+          "required": false,
+          "label": {
+            "en": "IoTaWatt",
+            "fr": "IoTaWatt",
+            "de": "IoTaWatt",
+            "es": "IoTaWatt"
+          },
+          "description": {
+            "en": "The IoTaWatt device itself (not a channel). Leave empty for any IoTaWatt.",
+            "fr": "L’appareil IoTaWatt lui-même (pas une voie). Laissez vide pour n’importe quel IoTaWatt.",
+            "de": "Das IoTaWatt-Gerät selbst (kein Kanal). Leer lassen für jeden IoTaWatt.",
+            "es": "El propio dispositivo IoTaWatt (no un canal). Déjelo vacío para cualquier IoTaWatt."
+          }
+        }
+      ],
+      "variables": [
+        {
+          "key": "meter",
+          "type": "string",
+          "label": {
+            "en": "Device",
+            "fr": "Appareil",
+            "de": "Gerät",
+            "es": "Dispositivo"
+          }
+        },
+        {
+          "key": "meter_name",
+          "type": "string",
+          "label": {
+            "en": "IoTaWatt name",
+            "fr": "Nom de l’IoTaWatt",
+            "de": "Name des IoTaWatt",
+            "es": "Nombre del IoTaWatt"
+          }
+        },
+        {
+          "key": "address",
+          "type": "string",
+          "label": {
+            "en": "Address",
+            "fr": "Adresse",
+            "de": "Adresse",
+            "es": "Dirección"
+          }
+        },
+        {
+          "key": "mac",
+          "type": "string",
+          "label": {
+            "en": "MAC address",
+            "fr": "Adresse MAC",
+            "de": "MAC-Adresse",
+            "es": "Dirección MAC"
+          }
+        },
+        {
+          "key": "message",
+          "type": "string",
+          "label": {
+            "en": "Message",
+            "fr": "Message",
+            "de": "Nachricht",
+            "es": "Mensaje"
+          }
+        },
+        {
+          "key": "down_minutes",
+          "type": "number",
+          "label": {
+            "en": "Minutes without answer",
+            "fr": "Minutes sans réponse",
+            "de": "Minuten ohne Antwort",
+            "es": "Minutos sin respuesta"
+          }
+        }
+      ]
+    },
+    {
+      "key": "meter_restarted",
+      "label": {
+        "en": "IoTaWatt: restarted",
+        "fr": "IoTaWatt : redémarré",
+        "de": "IoTaWatt: neu gestartet",
+        "es": "IoTaWatt: reiniciado"
+      },
+      "description": {
+        "en": "The IoTaWatt restarted (power cut, firmware update, crash).",
+        "fr": "L’IoTaWatt a redémarré (coupure de courant, mise à jour, plantage).",
+        "de": "Der IoTaWatt wurde neu gestartet (Stromausfall, Firmware-Update, Absturz).",
+        "es": "El IoTaWatt se ha reiniciado (corte de luz, actualización, bloqueo)."
+      },
+      "fields": [
+        {
+          "key": "meter",
+          "type": "select",
+          "source": "devices",
+          "required": false,
+          "label": {
+            "en": "IoTaWatt",
+            "fr": "IoTaWatt",
+            "de": "IoTaWatt",
+            "es": "IoTaWatt"
+          },
+          "description": {
+            "en": "The IoTaWatt device itself (not a channel). Leave empty for any IoTaWatt.",
+            "fr": "L’appareil IoTaWatt lui-même (pas une voie). Laissez vide pour n’importe quel IoTaWatt.",
+            "de": "Das IoTaWatt-Gerät selbst (kein Kanal). Leer lassen für jeden IoTaWatt.",
+            "es": "El propio dispositivo IoTaWatt (no un canal). Déjelo vacío para cualquier IoTaWatt."
+          }
+        }
+      ],
+      "variables": [
+        {
+          "key": "meter",
+          "type": "string",
+          "label": {
+            "en": "Device",
+            "fr": "Appareil",
+            "de": "Gerät",
+            "es": "Dispositivo"
+          }
+        },
+        {
+          "key": "meter_name",
+          "type": "string",
+          "label": {
+            "en": "IoTaWatt name",
+            "fr": "Nom de l’IoTaWatt",
+            "de": "Name des IoTaWatt",
+            "es": "Nombre del IoTaWatt"
+          }
+        },
+        {
+          "key": "address",
+          "type": "string",
+          "label": {
+            "en": "Address",
+            "fr": "Adresse",
+            "de": "Adresse",
+            "es": "Dirección"
+          }
+        },
+        {
+          "key": "mac",
+          "type": "string",
+          "label": {
+            "en": "MAC address",
+            "fr": "Adresse MAC",
+            "de": "MAC-Adresse",
+            "es": "Dirección MAC"
+          }
+        },
+        {
+          "key": "message",
+          "type": "string",
+          "label": {
+            "en": "Message",
+            "fr": "Message",
+            "de": "Nachricht",
+            "es": "Mensaje"
+          }
+        },
+        {
+          "key": "uptime_before_hours",
+          "type": "number",
+          "label": {
+            "en": "Hours running before",
+            "fr": "Heures de marche avant",
+            "de": "Laufzeit davor (Stunden)",
+            "es": "Horas en marcha antes"
+          }
+        }
+      ]
+    }
+  ],
+  "scene_actions": [
+    {
+      "key": "get_energy",
+      "timeout_seconds": 20,
+      "label": {
+        "en": "IoTaWatt: energy of a channel",
+        "fr": "IoTaWatt : énergie d’une voie",
+        "de": "IoTaWatt: Energie eines Kanals",
+        "es": "IoTaWatt: energía de un canal"
+      },
+      "description": {
+        "en": "Asks the IoTaWatt for the energy of a channel over a period (from its own log, in its local time): for a message, a report.",
+        "fr": "Demande à l’IoTaWatt l’énergie d’une voie sur une période (depuis son propre journal, à son heure locale) : pour un message, un bilan.",
+        "de": "Fragt den IoTaWatt nach der Energie eines Kanals über einen Zeitraum (aus seinem eigenen Protokoll, in seiner Ortszeit): für eine Nachricht, eine Bilanz.",
+        "es": "Pide al IoTaWatt la energía de un canal en un periodo (de su propio registro, en su hora local): para un mensaje, un balance."
+      },
+      "fields": [
+        {
+          "key": "channel",
+          "type": "select",
+          "source": "devices",
+          "required": false,
+          "label": {
+            "en": "Channel",
+            "fr": "Voie",
+            "de": "Kanal",
+            "es": "Canal"
+          },
+          "description": {
+            "en": "A channel of an IoTaWatt (a power one). Leave empty for the first power channel.",
+            "fr": "Une voie d’un IoTaWatt (de puissance). Laissez vide pour la première voie de puissance.",
+            "de": "Ein Kanal eines IoTaWatt (ein Leistungskanal). Leer lassen für den ersten Leistungskanal.",
+            "es": "Un canal de un IoTaWatt (de potencia). Déjelo vacío para el primer canal de potencia."
+          }
+        },
+        {
+          "key": "period",
+          "type": "select",
+          "required": false,
+          "default": "today",
+          "label": {
+            "en": "Period",
+            "fr": "Période",
+            "de": "Zeitraum",
+            "es": "Periodo"
+          },
+          "options": [
+            {
+              "value": "today",
+              "label": {
+                "en": "Today",
+                "fr": "Aujourd’hui",
+                "de": "Heute",
+                "es": "Hoy"
+              }
+            },
+            {
+              "value": "yesterday",
+              "label": {
+                "en": "Yesterday",
+                "fr": "Hier",
+                "de": "Gestern",
+                "es": "Ayer"
+              }
+            },
+            {
+              "value": "this_week",
+              "label": {
+                "en": "This week (from Sunday)",
+                "fr": "Cette semaine (depuis dimanche)",
+                "de": "Diese Woche (ab Sonntag)",
+                "es": "Esta semana (desde el domingo)"
+              }
+            },
+            {
+              "value": "last_week",
+              "label": {
+                "en": "Last week",
+                "fr": "La semaine dernière",
+                "de": "Letzte Woche",
+                "es": "La semana pasada"
+              }
+            },
+            {
+              "value": "this_month",
+              "label": {
+                "en": "This month",
+                "fr": "Ce mois-ci",
+                "de": "Dieser Monat",
+                "es": "Este mes"
+              }
+            },
+            {
+              "value": "last_month",
+              "label": {
+                "en": "Last month",
+                "fr": "Le mois dernier",
+                "de": "Letzter Monat",
+                "es": "El mes pasado"
+              }
+            },
+            {
+              "value": "this_year",
+              "label": {
+                "en": "This year",
+                "fr": "Cette année",
+                "de": "Dieses Jahr",
+                "es": "Este año"
+              }
+            },
+            {
+              "value": "last_24_hours",
+              "label": {
+                "en": "Last 24 hours",
+                "fr": "Dernières 24 heures",
+                "de": "Letzte 24 Stunden",
+                "es": "Últimas 24 horas"
+              }
+            },
+            {
+              "value": "last_7_days",
+              "label": {
+                "en": "Last 7 days",
+                "fr": "7 derniers jours",
+                "de": "Letzte 7 Tage",
+                "es": "Últimos 7 días"
+              }
+            },
+            {
+              "value": "last_30_days",
+              "label": {
+                "en": "Last 30 days",
+                "fr": "30 derniers jours",
+                "de": "Letzte 30 Tage",
+                "es": "Últimos 30 días"
+              }
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "key": "channel_name",
+          "type": "string",
+          "label": {
+            "en": "Channel name",
+            "fr": "Nom de la voie",
+            "de": "Name des Kanals",
+            "es": "Nombre del canal"
+          }
+        },
+        {
+          "key": "energy_kwh",
+          "type": "number",
+          "label": {
+            "en": "Energy (kWh)",
+            "fr": "Énergie (kWh)",
+            "de": "Energie (kWh)",
+            "es": "Energía (kWh)"
+          }
+        },
+        {
+          "key": "average_watts",
+          "type": "number",
+          "label": {
+            "en": "Average power (W)",
+            "fr": "Puissance moyenne (W)",
+            "de": "Durchschnittsleistung (W)",
+            "es": "Potencia media (W)"
+          }
+        },
+        {
+          "key": "period_start",
+          "type": "string",
+          "label": {
+            "en": "Start of the period",
+            "fr": "Début de la période",
+            "de": "Beginn des Zeitraums",
+            "es": "Inicio del periodo"
+          }
+        },
+        {
+          "key": "period_end",
+          "type": "string",
+          "label": {
+            "en": "End of the period",
+            "fr": "Fin de la période",
+            "de": "Ende des Zeitraums",
+            "es": "Fin del periodo"
+          }
+        },
+        {
+          "key": "summary",
+          "type": "string",
+          "label": {
+            "en": "Summary",
+            "fr": "Résumé",
+            "de": "Zusammenfassung",
+            "es": "Resumen"
+          }
+        }
+      ]
+    }
+  ]
+}

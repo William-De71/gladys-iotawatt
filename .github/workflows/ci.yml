@@ -1,0 +1,130 @@
+# -----------------------------------------------------------------------------
+# Continuous integration: every pull request, and the quality gate of the
+# Release workflow (workflow_call) on every push to main. No `push` trigger of
+# its own on main: release.yml runs it there, so a release is never cut from a
+# commit whose checks failed.
+#
+#   1. Prettier, ESLint and the tests, on Node 22 (the oldest version
+#      `engines` accepts) and Node 24 (the one the image ships with);
+#   2. the store admission checks, without the image check (the image of a
+#      version only exists once it is released);
+#   3. the Docker image, built for amd64 and never pushed, then started like
+#      Gladys runs it: a broken Dockerfile or a module that does not load
+#      shows up here rather than in a release.
+# -----------------------------------------------------------------------------
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+# Checks only read the code: no write scope for the token.
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    name: Lint & test (Node ${{ matrix.node-version }})
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [22, 24]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          # Never the runner's cached Node: it can predate a security release.
+          check-latest: true
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check formatting (Prettier)
+        run: npm run format:check
+
+      - name: Lint (ESLint)
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
+
+  store:
+    runs-on: ubuntu-latest
+    name: Store admission checks
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          # Never the runner's cached Node: it can predate a security release.
+          check-latest: true
+
+      - name: Validate the manifest, the cover and the docs
+        run: npx --yes github:GladysAssistant/integration-store . --skip-image-check
+
+  docker:
+    runs-on: ubuntu-latest
+    name: Docker build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      # Same build as build.yml, without pushing, and for amd64 only: emulating
+      # arm64 is slow, and only the release build needs it.
+      - name: Build (no push)
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/amd64
+          push: false
+          load: true
+          tags: gladys-iotawatt:ci
+
+      # The image as Gladys runs it (read-only, unprivileged, 256 MB, no
+      # network): every module loads, an IoTaWatt status converts into the
+      # devices and states of Gladys, the /data file is written with mode 0600.
+      - name: Smoke test of the image
+        run: |
+          set -euo pipefail
+          docker run --rm --read-only --memory 256m --network none --user node \
+            --tmpfs /data:uid=1000,gid=1000 --entrypoint node gladys-iotawatt:ci \
+            --input-type=module -e "
+              const { createApp } = await import('/app/src/app.js');
+              const { parseStatus, parseSeries, channelsOf } = await import('/app/src/parse.js');
+              const { buildMeterDevices, buildMeterStates } = await import('/app/src/device.js');
+              const { createStore } = await import('/app/src/store.js');
+              const { statSync } = await import('node:fs');
+              const status = parseStatus({ stats: { version: '02_08_04', lowbat: false }, wifi: { mac: '5C:CF:7F:12:34:56', RSSI: -60 }, inputs: [{ channel: 0, Vrms: 231.4 }, { channel: 1, Watts: '1520' }], outputs: [] });
+              const series = parseSeries({ series: [{ name: 'Voltage', unit: 'Volts' }, { name: 'Mains', unit: 'Watts' }] });
+              const meter = { mac: status.mac, name: 'IotaWatt', channels: channelsOf(status, series), status, totals: { in1: { importWh: 1500, exportWh: 0 } } };
+              const ids = { externalIds: (type, id) => ({ device: 'ext:iw:' + type + ':' + id, feature: (key) => 'ext:iw:' + type + ':' + id + ':' + key }) };
+              const devices = buildMeterDevices(ids, meter);
+              const states = buildMeterStates(ids, meter);
+              const store = createStore();
+              await store.save();
+              const mode = statSync('/data/iotawatt.json').mode & 0o777;
+              if (typeof createApp !== 'function' || devices.length !== 3 || states.length !== 6 || mode !== 0o600) {
+                console.log(devices.length, states.length, mode.toString(8));
+                process.exit(1);
+              }
+              console.log('modules load, a status converts into 3 devices and 6 states, /data/iotawatt.json is 0600');
+            "

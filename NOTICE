@@ -1,0 +1,12 @@
+Gladys IoTaWatt integration
+Copyright 2026 William Deren
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+It reads the IoTaWatt energy monitors of the user's own local network through
+their documented local API (https://docs.iotawatt.com, /status and /query).
+This integration is not affiliated with nor endorsed by IoTaWatt, Inc.
+IoTaWatt is a trademark of its owner. The endpoints and fields follow the
+published documentation and the firmware sources
+(https://github.com/boblemaire/IoTaWatt, GPL-3.0), read for the facts only:
+no code is taken from them, nor from the iotawattpy library (GPL-3.0).
